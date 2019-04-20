@@ -4,7 +4,7 @@
       "type": "java",
       "name": "CodeLens (Launch) - Crc",
       "request": "launch",
-      "mainClass": "Crc"
+      "mainClass": "TransparentTransmission"
     }
   ]
 }
