@@ -19,10 +19,10 @@ public class Crc {
    */
   public static String crcEncode(String infoString) {
     // CRC-CCITT = X16 + X12 + X5 + 1
-    String genXString = "1101"; // "10001000000100001";
+    String genXString = "10001000000100001";
     // 待发送数据、生成多项式
-    long infoStringData = Long.parseLong(infoString, 2);
-    long genXStringData = Long.parseLong(genXString, 2);
+    BigInteger infoStringData = new BigInteger(infoString, 2);
+    BigInteger genXStringData = new BigInteger(genXString, 2);
 
     System.out.println("Encoding polynomial: CRC-CCITT " + genXString);
 
@@ -30,24 +30,26 @@ public class Crc {
     int infoStringLength = infoString.length();
     int genXStringLength = genXString.length();
     // 移位
-    infoStringData = infoStringData << (genXStringLength - 1);
-    genXStringData = genXStringData << (infoStringLength - 1);
+    infoStringData = infoStringData.shiftLeft(genXStringLength - 1);
+    genXStringData = genXStringData.shiftLeft(infoStringLength - 1);
 
     BigInteger bigInteger = new BigInteger("2");
     int length = infoStringLength + genXStringLength - 1;
-    long flag = bigInteger.pow(length - 1).longValue();
+    BigInteger flag = bigInteger.pow(length - 1);
+
+    BigInteger bigZero = new BigInteger("0");
 
     for (int i = 0; i < infoStringLength; i++) {
-      if ((infoStringData & flag) != 0) {
-        infoStringData = infoStringData ^ genXStringData;
-        genXStringData = genXStringData >> 1;
+      if (!infoStringData.and(flag).equals(bigZero)) {
+        infoStringData = infoStringData.xor(genXStringData);
+        genXStringData = genXStringData.shiftRight(1);
       } else {
-        genXStringData = genXStringData >> 1;
+        genXStringData = genXStringData.shiftRight(1);
       }
-      flag = flag >> 1;
+      flag = flag.shiftRight(1);
     }
 
-    String crc = Long.toBinaryString(infoStringData);
+    String crc = infoStringData.toString(2);
     crc = showCompleteBinaryNumber(crc, genXStringLength - 1);
     return crc;
   }
@@ -55,7 +57,7 @@ public class Crc {
   public static void main(String[] args) {
     System.out.println("[INFO] Sender up...");
     // 发送数据
-    String infoStringToSend = "10011010"; // "01101100011001110100110000110110";
+    String infoStringToSend = "011011111111111111111111110"; // "01101100011001110100110000110110";
     System.out.println("Info string to send: " + infoStringToSend);
 
     // 编码
@@ -67,7 +69,7 @@ public class Crc {
 
     System.out.println("[INFO] Receiver up...");
 
-    String infoStringReceived = "10011010101";
+    String infoStringReceived = "0110111111111111111111111100110001011001011";
     System.out.println("Info String received: " + infoStringReceived);
 
     String receivedCrc = crcEncode(infoStringReceived);
