@@ -7,7 +7,7 @@ public class Crc {
   /*
    * Java doesn't show binary number with leading zeros.
    */
-  public static String showCompleteBinaryNumber(String binaryNumber, int binaryNumberDesignedLength) {
+  private static String showCompleteBinaryNumber(String binaryNumber, int binaryNumberDesignedLength) {
     while (binaryNumber.length() < binaryNumberDesignedLength) {
       binaryNumber = "0" + binaryNumber;
     }
@@ -74,5 +74,11 @@ public class Crc {
 
     String receivedCrc = crcEncode(infoStringReceived);
     System.out.println("Received CRC Code: " + receivedCrc);
+
+    if (Integer.valueOf(receivedCrc) == 0) {
+      System.out.println("Received string is valid.");
+    } else {
+      System.out.println("Received string is invalid.");
+    }
   }
 }
