@@ -10,15 +10,21 @@
 
 待发送的数据信息二进制比特串（32 位）:
 
-`InfoString1=0110XXXXXXXXXXXXXXXXXXXX110`
+```
+InfoString1=0110XXXXXXXXXXXXXXXXXXXX110
+```
 
 收发双方预定的生成多项式采用 `CRC-CCITT=X16+X12+X5+1`，对应的二进制比特串（17 位）：
 
-`GenXString=10001000000100001`
+```
+GenXString=10001000000100001
+```
 
 接收的数据信息二进制比特串（32 位）：
 
-`InfoString2=0110XXXXXXXXXXXXXXXXXXXX110`
+```
+InfoString2=0110XXXXXXXXXXXXXXXXXXXX110
+```
 
 **程序运行屏幕输出要点：**
 
@@ -40,11 +46,15 @@
 
 - 待发送的数据信息二进制比特串（32 位）
 
-`InfoString1=0110XXXXXX11111111111XXXXXXXX110`
+```
+InfoString1=0110XXXXXX11111111111XXXXXXXX110
+```
 
 - 帧起始和结束标志二进制比特串
 
-`FlagString=01111110`
+```
+FlagString=01111110
+```
 
 ### 比特填充程序运行屏幕输出关键要点：
 
@@ -56,11 +66,15 @@
 
 - 待发送的数据信息十六进制串（64 位）
 
-`InfoString1=347D7E807E40AA7D`
+```
+InfoString1=347D7E807E40AA7D
+```
 
 - 帧起始和结束标志十六进制串
 
-`FlagString=7E`
+```
+FlagString=7E
+```
 
 ### 字节填充程序运行屏幕输出关键要点：
 
