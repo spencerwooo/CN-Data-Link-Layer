@@ -8,7 +8,7 @@ public class Crc {
    * Java doesn't show binary number with leading zeros.
    */
   public static String showCompleteBinaryNumber(String binaryNumber, int binaryNumberDesignedLength) {
-    while (binaryNumber.length() < binaryNumberDesignedLength - 1) {
+    while (binaryNumber.length() < binaryNumberDesignedLength) {
       binaryNumber = "0" + binaryNumber;
     }
     return binaryNumber;
@@ -48,26 +48,29 @@ public class Crc {
     }
 
     String crc = Long.toBinaryString(infoStringData);
-    // crc = showCompleteBinaryNumber(crc, genXStringLength - 1);
+    crc = showCompleteBinaryNumber(crc, genXStringLength - 1);
     return crc;
   }
 
   public static void main(String[] args) {
+    System.out.println("[INFO] Sender up...");
     // 发送数据
-    String infoStringToSend = "11111001"; // "01101100011001110100110000110110";
+    String infoStringToSend = "10011010"; // "01101100011001110100110000110110";
     System.out.println("Info string to send: " + infoStringToSend);
 
     // 编码
     String crc = crcEncode(infoStringToSend);
-    System.out.println("CRC Code: " + crc);
+    System.out.println("Info string CRC Code: " + crc);
 
     String infoStringSent = infoStringToSend + crc;
     System.out.println("Info string sent: " + infoStringSent);
 
-    // String infoStringReceived = "01101100011001110100010000110110";
-    // System.out.println("Info String received: " + infoStringReceived);
+    System.out.println("[INFO] Receiver up...");
 
-    String sentCrc = crcEncode(infoStringSent);
-    System.out.println(sentCrc);
+    String infoStringReceived = "10011010101";
+    System.out.println("Info String received: " + infoStringReceived);
+
+    String receivedCrc = crcEncode(infoStringReceived);
+    System.out.println("Received CRC Code: " + receivedCrc);
   }
 }
