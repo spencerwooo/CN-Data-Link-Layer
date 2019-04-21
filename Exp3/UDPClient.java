@@ -18,8 +18,8 @@ public class UDPClient {
 
     Scanner scanner = new Scanner(System.in);
     while (true) {
+      System.out.print("Sending: ");
       String input = scanner.nextLine();
-      System.out.println("Client sent: " + input);
       buf = input.getBytes();
 
       DatagramPacket dataPacket = new DatagramPacket(buf, buf.length, ip, UDPPort);
