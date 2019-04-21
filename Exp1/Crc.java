@@ -57,7 +57,7 @@ public class Crc {
   public static void main(String[] args) {
     System.out.println("[INFO] Sender up...");
     // 发送数据
-    String infoStringToSend = "011011111111111111111111110"; // "01101100011001110100110000110110";
+    String infoStringToSend = "011011111111111111111111110";
     System.out.println("Info string to send: " + infoStringToSend);
 
     // 编码
