@@ -7,24 +7,38 @@ import java.util.Scanner;
  * UDPClient
  */
 public class UDPClient {
-  private static final int UDPPort = 8888;
+  private static final int UDPServerPort = 8888;
+  private static final int UDPClientPort = 9999;
+
+  private static final int FilterError = 10;
+  private static final int FilterLost = 10;
 
   public static void main(String[] args) throws Exception {
-    System.out.println("[INFO] UDP Client started. Sending packets to port: " + UDPPort);
+    System.out.println("[INFO] UDP Client started. Sending packets to port: " + UDPServerPort);
 
-    DatagramSocket socket = new DatagramSocket();
+    DatagramSocket socket = new DatagramSocket(UDPClientPort);
     InetAddress ip = InetAddress.getByName("localhost");
-    byte buf[] = null;
+    byte senderPacketBuffer[] = null;
+    byte[] receiverPacketBuffer = new byte[65536];
+
+    DataHandler dataHandler = new DataHandler();
 
     Scanner scanner = new Scanner(System.in);
+    int index = 0;
     while (true) {
-      System.out.print("Sending: ");
+      System.out.print("Sending Packet " + index + ": ");
       String input = scanner.nextLine();
-      buf = input.getBytes();
+      senderPacketBuffer = input.getBytes();
 
-      DatagramPacket dataPacket = new DatagramPacket(buf, buf.length, ip, UDPPort);
-      socket.send(dataPacket);
+      DatagramPacket senderDataPacket = new DatagramPacket(senderPacketBuffer, senderPacketBuffer.length, ip,
+          UDPServerPort);
+      socket.send(senderDataPacket);
 
+      DatagramPacket receiverDataPacket = new DatagramPacket(receiverPacketBuffer, receiverPacketBuffer.length);
+      socket.receive(receiverDataPacket);
+      System.out.println("Server sent back: " + dataHandler.byteStreamToString(receiverPacketBuffer));
+
+      index++;
       if (input.equals("bye")) {
         break;
       }
