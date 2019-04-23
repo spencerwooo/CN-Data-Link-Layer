@@ -1,6 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 /**
  * UDPServer
@@ -9,6 +10,8 @@ public class UDPServer {
 
   private static final int UDPServerPort = 8888;
   private static final int UDPClientPort = 9999;
+
+  private static final byte[] zeroByte = {(byte) 0};
 
   public static void main(String[] args) throws Exception {
     DatagramSocket socket = new DatagramSocket(UDPServerPort);
@@ -26,17 +29,42 @@ public class UDPServer {
     while (index < 24) {
       DatagramPacket receiverDataPacket = new DatagramPacket(receiverBuffer, receiverBuffer.length);
       socket.receive(receiverDataPacket);
+      // Trim trailing zeros from received packet
+      receiverBuffer = dataHandler.trimByteArray(receiverBuffer);
+      // System.out.println(Arrays.toString(receiverBuffer));
 
-      System.out.println(dataHandler.crcEncode(receiverBuffer));
+      // Find inserted zero in byte stream
+      int pointer = 0;
+      while (pointer < receiverBuffer.length) {
+        if (receiverBuffer[pointer] == 0) {
+          break;
+        }
+        pointer++;
+      }
 
-      System.out.println("Client sent packet " + index + ": " + dataHandler.byteStreamToString(receiverBuffer));
+      // Get received buffer and expected checksum
+      byte[] expectedChecksumRaw = Arrays.copyOfRange(receiverBuffer, pointer + 1, receiverBuffer.length);
+      expectedChecksumRaw = dataHandler.appendByteArray(expectedChecksumRaw, zeroByte);
+      receiverBuffer = Arrays.copyOf(receiverBuffer, pointer + 1);
 
-      senderBuffer = String.valueOf(index).getBytes();
+      String actualChecksum = dataHandler.crcEncode(receiverBuffer);
+      String expectedChecksum = dataHandler.byteStreamToString(expectedChecksumRaw);
+      System.out.println("Actual:" + actualChecksum + "; Expected: " + expectedChecksum);
 
-      DatagramPacket senderDataPacket = new DatagramPacket(senderBuffer, senderBuffer.length, ip, UDPClientPort);
-      socket.send(senderDataPacket);
+      System.out.println("Client sent packet " + index + ": " + dataHandler.byteStreamToString(receiverBuffer) + " is as expected.");
+      if (actualChecksum.equals(expectedChecksum)) {
+        senderBuffer = String.valueOf(index).getBytes();
 
-      index++;
+        DatagramPacket senderDataPacket = new DatagramPacket(senderBuffer, senderBuffer.length, ip, UDPClientPort);
+        socket.send(senderDataPacket);
+
+        index++;
+      } else {
+        senderBuffer = String.valueOf(invalid).getBytes();
+
+        DatagramPacket senderDataPacket = new DatagramPacket(senderBuffer, senderBuffer.length, ip, UDPClientPort);
+        socket.send(senderDataPacket);
+      }
 
       receiverBuffer = new byte[65536];
     }

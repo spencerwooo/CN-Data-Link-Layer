@@ -1,9 +1,7 @@
-import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -17,6 +15,8 @@ public class UDPClient {
   private static final int filterLost = 10;
 
   private static final int requestTimeOutDelay = 5000;
+
+  private static final byte[] zeroByte = {(byte) 0};
 
   // 24 items in sender list
   private static final String[] senderList = { "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing",
@@ -58,7 +58,7 @@ public class UDPClient {
     DatagramSocket socket = new DatagramSocket(UDPClientPort);
     DataHandler dataHandler = new DataHandler();
     InetAddress ip = InetAddress.getByName("localhost");
-    byte[] senderPacketBuffer = new byte[65536];
+    byte[] senderPacketBuffer = null;
     byte[] receiverPacketBuffer = new byte[65536];
 
     int senderListLength = senderList.length;
@@ -75,10 +75,12 @@ public class UDPClient {
       System.out.println("[Sender]");
       System.out.println("Sending Packet " + index + ": " + senderOriginalItem);
       senderPacketBuffer = senderOriginalItem.getBytes();
+      // Add a trailing zero to the end of the sender packet
+      senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, zeroByte);
 
-      int checksum = dataHandler.crcEncode(senderPacketBuffer);
+      // Get checksum in HEX string format
+      String checksum = dataHandler.crcEncode(senderPacketBuffer);
 
-      System.out.println(Arrays.toString(senderPacketBuffer));
       System.out.println(checksum);
 
       if (lostPacket == 1) {
@@ -89,7 +91,7 @@ public class UDPClient {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.ALTERED);
       }
 
-      System.out.println(Arrays.toString(senderPacketBuffer));
+      senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, checksum.getBytes());
 
       try {
         if (lostPacket != 1) {
@@ -113,7 +115,7 @@ public class UDPClient {
               System.out.println("Server sent back: " + receivedString);
               index++;
             } else {
-              throw new Exception("Invalid packet.");
+              throw new Exception("Invalid packet. ");
             }
 
             Thread.sleep(1000);
