@@ -5,7 +5,7 @@ public class DataHandler {
   /*
    * Convert byte stream to string.
    */
-  public StringBuilder byteStreamToString(byte[] buf) {
+  public String byteStreamToString(byte[] buf) {
     if (buf == null) {
       return null;
     }
@@ -13,6 +13,6 @@ public class DataHandler {
     for (int i = 0; buf[i] != 0; i++) {
       data.append((char) buf[i]);
     }
-    return data;
+    return data.toString();
   }
 }
