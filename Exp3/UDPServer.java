@@ -26,6 +26,11 @@ public class UDPServer {
     while (index < 24) {
       DatagramPacket receiverDataPacket = new DatagramPacket(receiverBuffer, receiverBuffer.length);
       socket.receive(receiverDataPacket);
+
+      String validation = dataHandler.crcEncode(receiverBuffer);
+
+      System.out.println(validation);
+
       System.out.println("Client sent packet " + index + ": " + dataHandler.byteStreamToString(receiverBuffer));
 
       senderBuffer = String.valueOf(index).getBytes();

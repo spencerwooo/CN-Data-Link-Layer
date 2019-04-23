@@ -68,9 +68,14 @@ public class UDPClient {
       // One out of ten packet gets altered
       int errorPacket = ThreadLocalRandom.current().nextInt(1, filterError);
 
+      String senderOriginalItem = senderList[index];
+
       System.out.println("[Sender]");
-      System.out.println("Sending Packet " + index + ": " + senderList[index]);
-      senderPacketBuffer = senderList[index].getBytes();
+      System.out.println("Sending Packet " + index + ": " + senderOriginalItem);
+      senderPacketBuffer = senderOriginalItem.getBytes();
+
+      String checksumString = dataHandler.crcEncode(senderPacketBuffer);
+      byte[] checksum = checksumString.getBytes();
 
       if (lostPacket == 1) {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.LOST);
@@ -79,6 +84,8 @@ public class UDPClient {
       if (errorPacket == 1) {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.ALTERED);
       }
+
+      senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, checksum);
 
       try {
         if (lostPacket != 1) {
