@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * DataHandler
  */
@@ -32,7 +28,7 @@ public class DataHandler {
    * @param buf
    * @return
    */
-  public String crcEncode(byte[] buf) {
+  public int crcEncode(byte[] buf) {
     int crc = 0xffff;
 
     for (byte b : buf) {
@@ -46,8 +42,7 @@ public class DataHandler {
     }
 
     crc &= 0xffff;
-    Integer.toHexString(crc);
-    return Integer.toHexString(crc);
+    return crc;
   }
 
   /**

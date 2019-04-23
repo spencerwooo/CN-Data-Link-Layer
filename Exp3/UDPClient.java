@@ -1,7 +1,9 @@
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -42,7 +44,7 @@ public class UDPClient {
     case ALTERED:
       int len = buf.length;
       int randomNumber = ThreadLocalRandom.current().nextInt(0, len);
-      buf[randomNumber] = buf[len - randomNumber];
+      buf[randomNumber] = buf[1];
       break;
     default:
       break;
@@ -74,18 +76,20 @@ public class UDPClient {
       System.out.println("Sending Packet " + index + ": " + senderOriginalItem);
       senderPacketBuffer = senderOriginalItem.getBytes();
 
-      String checksumString = dataHandler.crcEncode(senderPacketBuffer);
-      byte[] checksum = checksumString.getBytes();
+      int checksum = dataHandler.crcEncode(senderPacketBuffer);
+
+      System.out.println(Arrays.toString(senderPacketBuffer));
+      System.out.println(checksum);
 
       if (lostPacket == 1) {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.LOST);
       }
 
-      if (errorPacket == 1) {
+      if (errorPacket != 1) {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.ALTERED);
       }
 
-      senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, checksum);
+      System.out.println(Arrays.toString(senderPacketBuffer));
 
       try {
         if (lostPacket != 1) {

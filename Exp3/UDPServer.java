@@ -27,9 +27,7 @@ public class UDPServer {
       DatagramPacket receiverDataPacket = new DatagramPacket(receiverBuffer, receiverBuffer.length);
       socket.receive(receiverDataPacket);
 
-      String validation = dataHandler.crcEncode(receiverBuffer);
-
-      System.out.println(validation);
+      System.out.println(dataHandler.crcEncode(receiverBuffer));
 
       System.out.println("Client sent packet " + index + ": " + dataHandler.byteStreamToString(receiverBuffer));
 
