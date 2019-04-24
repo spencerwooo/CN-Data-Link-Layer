@@ -14,8 +14,9 @@ public class UDPClient {
   private static final int filterError = 10;
   private static final int filterLost = 10;
 
+  // 5s timeout
   private static final int requestTimeOutDelay = 5000;
-
+  // Add zero to end of frame
   private static final byte[] zeroByte = { (byte) 0 };
 
   // 24 items in sender list
@@ -23,16 +24,17 @@ public class UDPClient {
       "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua", "Ut",
       "enim", "ad", "minim", "veniam" };
 
+  // Frame lost or altered
   enum FilterType {
     LOST, ALTERED;
   }
 
   /**
-   * Filter byte array
+   * Filter frame
    *
    * @param buf:        input byte array
    * @param FilterType: data lost or data altered
-   * @return byte array
+   * @return Filtered frame
    */
   public static byte[] dataFilter(byte[] buf, FilterType filterType) {
     switch (filterType) {
@@ -74,11 +76,13 @@ public class UDPClient {
 
       System.out.println("[Sender]");
       System.out.println("Sending Packet " + index + ": " + senderOriginalItem);
+
+      // Data to byte array
       senderPacketBuffer = senderOriginalItem.getBytes();
       // Add a trailing zero to the end of the sender packet
       senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, zeroByte);
 
-      // Get checksum in HEX string format
+      // Get checksum in string format
       String checksum = dataHandler.crcEncode(senderPacketBuffer);
 
       System.out.println(checksum);
@@ -91,8 +95,10 @@ public class UDPClient {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.ALTERED);
       }
 
+      // Add checksum to end of frame
       senderPacketBuffer = dataHandler.appendByteArray(senderPacketBuffer, checksum.getBytes());
 
+      // Packet to send: [Frame] + [0] + [Checksum]
       try {
         if (lostPacket != 1) {
           DatagramPacket senderDataPacket = new DatagramPacket(senderPacketBuffer, senderPacketBuffer.length, ip,
@@ -111,27 +117,31 @@ public class UDPClient {
             socket.receive(receiverDataPacket);
 
             String receivedString = dataHandler.byteStreamToString(receiverPacketBuffer);
+            // Check received packet, expected value is frame index
             if (Integer.valueOf(receivedString) != -1) {
               System.out.println("Server sent back: " + receivedString);
               index++;
             } else {
+              // If packet is "-1", then the received packet is invalid
               throw new Exception("Invalid packet. ");
             }
 
             Thread.sleep(1000);
             break;
+
           } catch (SocketTimeoutException e) {
+            // Catch timeout exception
             System.out.println("Response timeout. Resending packet " + index);
             break;
           }
         }
 
       } catch (Exception e) {
+        // Catch packet error and packet timeout exception, resend packet
         System.out.println(e + "Resending packet " + index);
       }
     }
 
-    // scanner.close();
     socket.close();
   }
 }
