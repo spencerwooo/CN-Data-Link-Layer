@@ -16,7 +16,7 @@ public class UDPClient {
 
   private static final int requestTimeOutDelay = 5000;
 
-  private static final byte[] zeroByte = {(byte) 0};
+  private static final byte[] zeroByte = { (byte) 0 };
 
   // 24 items in sender list
   private static final String[] senderList = { "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing",
@@ -43,7 +43,7 @@ public class UDPClient {
     // Data packet errored
     case ALTERED:
       int len = buf.length;
-      int randomNumber = ThreadLocalRandom.current().nextInt(0, len);
+      int randomNumber = ThreadLocalRandom.current().nextInt(0, len - 1);
       buf[randomNumber] = buf[1];
       break;
     default:
@@ -87,7 +87,7 @@ public class UDPClient {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.LOST);
       }
 
-      if (errorPacket != 1) {
+      if (errorPacket == 1) {
         senderPacketBuffer = dataFilter(senderPacketBuffer, FilterType.ALTERED);
       }
 
